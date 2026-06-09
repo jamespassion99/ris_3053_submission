@@ -5,6 +5,7 @@
 - `試題1/`：內政部戶政司 3053 門牌資料爬蟲。
 - `試題2/`：讀取試題 1 SQLite 資料庫的後端 API。
 - `試題3/`：Log 收集器與異常通知平台。
+- `試題4/`：上述題目的系統架構圖與資料流圖。
 
 ## 執行順序
 
@@ -55,3 +56,13 @@ python main.py
 - 試題1爬蟲過程發生異常時，寫入 `試題3/notifications/notifications.jsonl`。
 - 試題2 `/records` 查詢結果為空或 `/records/{id}` 查無資料時，寫入異常通知。
 - 試題2 API 查詢紀錄寫入 `試題2/logs/api-query.jsonl`。
+
+## 試題4系統架構圖
+
+架構圖文件：
+
+```text
+試題4/系統架構圖.md
+```
+
+內容包含整體系統架構、資料流、部署流程、異常通知流程，使用 Mermaid 語法，可在 GitHub / GitLab Markdown 直接檢視。
