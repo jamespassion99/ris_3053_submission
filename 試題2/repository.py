@@ -1,4 +1,4 @@
-﻿"""SQLite data access layer for RIS API service."""
+"""SQLite data access layer for RIS API service."""
 
 from __future__ import annotations
 
@@ -8,14 +8,24 @@ from typing import Any, Dict, List, Tuple
 
 
 class DatabaseNotReadyError(RuntimeError):
-    """Raised when the crawler database has not been created yet."""
+    """當爬蟲資料庫尚未建立或找不到時丟出的自訂例外。"""
 
 
 class RisRepository:
+    """集中管理 API 對 SQLite 的所有讀取操作。
+
+    Handler 只負責 HTTP，真正的 SQL 都放在 repository，讓路由與資料存取分層清楚。
+    """
+
     def __init__(self, database_path: Path) -> None:
+        """保存 SQLite 路徑；實際連線在每次查詢時才建立。"""
         self.database_path = database_path
 
     def health(self) -> Dict[str, Any]:
+        """回傳 API 健康狀態與資料庫基本統計。
+
+        /health 會使用這個方法確認 DB 是否存在，以及 doorplate_record/crawl_job 筆數。
+        """
         exists = self.database_path.exists()
         if not exists:
             return {
@@ -36,6 +46,7 @@ class RisRepository:
             }
 
     def list_records(self, filters: Dict[str, str], limit: int, offset: int) -> Dict[str, Any]:
+        """依查詢參數取得門牌資料列表，並回傳 total/limit/offset/items。"""
         where_sql, params = self._build_record_where(filters)
         sql = f"""
             SELECT
@@ -57,6 +68,7 @@ class RisRepository:
         count_sql = f"SELECT COUNT(*) AS total FROM doorplate_record {where_sql}"
 
         with self._connect() as conn:
+            # total 使用同一組 WHERE 條件，讓前端知道符合條件總共有幾筆。
             total = conn.execute(count_sql, params).fetchone()["total"]
             rows = conn.execute(sql, params + [limit, offset]).fetchall()
             return {
@@ -67,6 +79,7 @@ class RisRepository:
             }
 
     def get_record(self, record_id: int) -> Dict[str, Any] | None:
+        """依 id 查詢單筆門牌資料；查無資料時回傳 None。"""
         sql = """
             SELECT
                 id,
@@ -84,10 +97,12 @@ class RisRepository:
             WHERE id = ?
         """
         with self._connect() as conn:
+            # 使用參數化查詢，避免將使用者輸入直接串進 SQL。
             row = conn.execute(sql, [record_id]).fetchone()
             return dict(row) if row else None
 
     def list_jobs(self, status: str, limit: int, offset: int) -> Dict[str, Any]:
+        """查詢爬蟲 job 紀錄，可用 status 過濾 success/failed。"""
         params: List[Any] = []
         where_sql = ""
         if status:
@@ -130,6 +145,10 @@ class RisRepository:
             }
 
     def _connect(self) -> sqlite3.Connection:
+        """建立 SQLite 連線並設定 row_factory。
+
+        row_factory 設為 sqlite3.Row 後，查詢結果可以用欄位名稱取值，轉 dict 也方便。
+        """
         if not self.database_path.exists():
             raise DatabaseNotReadyError(
                 f"Database not found: {self.database_path}. Run the crawler first."
@@ -140,16 +159,23 @@ class RisRepository:
 
     @staticmethod
     def _count_table(conn: sqlite3.Connection, table_name: str) -> int:
+        """安全統計資料表筆數；若資料表不存在則回傳 0。"""
         try:
             return int(conn.execute(f"SELECT COUNT(*) AS total FROM {table_name}").fetchone()["total"])
         except sqlite3.Error:
+            # DB 檔存在但 schema 尚未建立或損壞時，/health 仍能回應。
             return 0
 
     @staticmethod
     def _build_record_where(filters: Dict[str, str]) -> Tuple[str, List[Any]]:
+        """根據 /records query string 組出 WHERE 子句與 SQL 參數。
+
+        欄位名稱由程式白名單控制，值一律用 ? 參數帶入，避免 SQL injection。
+        """
         clauses: List[str] = []
         params: List[Any] = []
 
+        # API 參數名稱與 DB 欄位名稱不同，集中在這裡對應。
         exact_fields = {
             "cityCode": "city_code",
             "areaCode": "area_code",
