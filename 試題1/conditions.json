@@ -1,0 +1,147 @@
+{
+  "base_url": "https://www.ris.gov.tw",
+  "raw_dir": "data/raw",
+  "csv_dir": "data/csv",
+  "log_dir": "logs",
+  "database_path": "data/ris_doorplate.sqlite3",
+  "request_timeout_seconds": 30,
+  "sleep_seconds_between_requests": 2,
+  "schedule": {
+    "enabled": false,
+    "daily_at": "02:00"
+  },
+  "queries": [
+    {
+      "name": "taipei_songshan_松山區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000010",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_xinyi_信義區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000020",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_daan_大安區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000030",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_zhongshan_中山區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000040",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_zhongzheng_中正區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000050",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_datong_大同區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000060",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_wanhua_萬華區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000070",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_wenshan_文山區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000080",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_nangang_南港區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000090",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_neihu_內湖區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000100",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_shilin_士林區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000110",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    },
+    {
+      "name": "taipei_beitou_北投區_initial_1140901_1141130",
+      "cityCode": "63000000",
+      "areaCode": "63000120",
+      "sDate": "114/09/01",
+      "eDate": "114/11/30",
+      "registerKind": "1",
+      "includeNoDate": false,
+      "village": "",
+      "neighbor": ""
+    }
+  ]
+}

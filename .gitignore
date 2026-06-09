@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Runtime outputs; keep directory placeholders only
+試題1/data/raw/**
+!試題1/data/raw/.gitkeep
+試題1/data/csv/**
+!試題1/data/csv/.gitkeep
+試題1/data/captcha/**
+!試題1/data/captcha/.gitkeep
+試題1/logs/**
+!試題1/logs/.gitkeep
+試題1/data/*.sqlite3
+試題1/data/*.sqlite3-*
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/

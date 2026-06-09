@@ -1,0 +1,15 @@
+試題2 API 執行說明
+
+1. 先確認試題1已經執行過，並產生 SQLite：
+   C:\Users\user\ris_3053_gitlab_submission\試題1\data\ris_doorplate.sqlite3
+2. 開啟 PowerShell。
+3. 切換到試題2資料夾：
+   cd C:\Users\user\ris_3053_gitlab_submission\試題2
+4. 啟動 API：
+   python main.py
+5. 另開 PowerShell 測試：
+   Invoke-RestMethod "http://127.0.0.1:8000/health"
+   Invoke-RestMethod "http://127.0.0.1:8000/records?limit=20"
+   Invoke-RestMethod "http://127.0.0.1:8000/jobs?limit=10"
+
+停止 API：在 API 視窗按 Ctrl+C。

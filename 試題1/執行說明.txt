@@ -1,0 +1,18 @@
+試題1 爬蟲執行說明
+
+1. 開啟 PowerShell。
+2. 切換到試題1資料夾：
+   cd C:\Users\user\ris_3053_gitlab_submission\試題1
+3. 執行一次爬蟲：
+   python main.py --once
+4. 畫面出現 CAPTCHA 圖片路徑後，立即開啟圖片並輸入驗證碼。
+5. 執行完成後檢查：
+   - data/raw/ 是否有 JSON
+   - data/csv/ 是否有 CSV
+   - data/ris_doorplate.sqlite3 是否存在
+   - logs/crawler-info.log 是否有成功紀錄
+
+排程執行：
+   python main.py --schedule
+
+注意：如果 CAPTCHA 等太久才輸入，網站可能回傳錯誤或 0 筆，請重新執行。
