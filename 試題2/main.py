@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlparse
 
+from notification import append_jsonl, default_notification_path, notify_event, utc_now
 from repository import DatabaseNotReadyError, RisRepository
 
 
@@ -28,6 +29,8 @@ class JsonApiHandler(BaseHTTPRequestHandler):
     repository: RisRepository
     default_limit: int
     max_limit: int
+    query_log_path: Path
+    notification_path: Path
 
     def do_GET(self) -> None:  # noqa: N802 - required by BaseHTTPRequestHandler
         """處理所有 GET API 請求。
@@ -54,6 +57,16 @@ class JsonApiHandler(BaseHTTPRequestHandler):
                 limit = self._read_int(query, "limit", self.default_limit, 1, self.max_limit)
                 offset = self._read_int(query, "offset", 0, 0, 10_000_000)
                 data = self.repository.list_records(query, limit=limit, offset=offset)
+                self._record_api_query(path, query, HTTPStatus.OK, data.get("total", 0))
+                if data.get("total", 0) == 0:
+                    notify_event(
+                        self.notification_path,
+                        service="試題2 API",
+                        severity="warning",
+                        event_type="api_empty_result",
+                        message="/records 查詢結果為空",
+                        details={"path": path, "query": query, "limit": limit, "offset": offset},
+                    )
                 self._send_json(HTTPStatus.OK, data)
                 return
 
@@ -63,8 +76,18 @@ class JsonApiHandler(BaseHTTPRequestHandler):
                 record_id = int(record_match.group(1))
                 record = self.repository.get_record(record_id)
                 if record is None:
+                    self._record_api_query(path, query, HTTPStatus.NOT_FOUND, 0)
+                    notify_event(
+                        self.notification_path,
+                        service="試題2 API",
+                        severity="warning",
+                        event_type="api_empty_result",
+                        message=f"/records/{record_id} 查無資料",
+                        details={"path": path, "record_id": record_id},
+                    )
                     self._send_json(HTTPStatus.NOT_FOUND, {"error": "record_not_found"})
                     return
+                self._record_api_query(path, query, HTTPStatus.OK, 1)
                 self._send_json(HTTPStatus.OK, record)
                 return
 
@@ -73,6 +96,7 @@ class JsonApiHandler(BaseHTTPRequestHandler):
                 offset = self._read_int(query, "offset", 0, 0, 10_000_000)
                 status = query.get("status", "")
                 data = self.repository.list_jobs(status=status, limit=limit, offset=offset)
+                self._record_api_query(path, query, HTTPStatus.OK, data.get("total", 0))
                 self._send_json(HTTPStatus.OK, data)
                 return
 
@@ -101,6 +125,21 @@ class JsonApiHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(body)
+
+
+    def _record_api_query(self, path: str, query: Dict[str, str], status: HTTPStatus, result_count: int) -> None:
+        """將 API 查詢紀錄寫入 JSONL，供試題3平台檢視。"""
+        append_jsonl(
+            self.query_log_path,
+            {
+                "created_at": utc_now(),
+                "client_ip": self.client_address[0],
+                "path": path,
+                "query": query,
+                "status": status.value,
+                "result_count": result_count,
+            },
+        )
 
     @staticmethod
     def _flatten_query(raw_query: Dict[str, list[str]]) -> Dict[str, str]:
@@ -143,13 +182,20 @@ def create_handler(config: Dict[str, Any], config_path: Path) -> type[JsonApiHan
         # 相對路徑以 config.json 所在資料夾為基準，避免從不同 cwd 啟動時找不到 DB。
         database_path = (config_path.parent / database_path).resolve()
 
+    log_dir = Path(config.get("log_dir", "logs"))
+    if not log_dir.is_absolute():
+        log_dir = (config_path.parent / log_dir).resolve()
+    query_log_path = log_dir / "api-query.jsonl"
+    notification_path = default_notification_path(config_path.parent)
+
     class ConfiguredHandler(JsonApiHandler):
         """帶入 config 後的實際 handler class。"""
 
-        repository = RisRepository(database_path)
-        default_limit = int(config.get("default_limit", 50))
-        max_limit = int(config.get("max_limit", 500))
-
+    ConfiguredHandler.repository = RisRepository(database_path)
+    ConfiguredHandler.default_limit = int(config.get("default_limit", 50))
+    ConfiguredHandler.max_limit = int(config.get("max_limit", 500))
+    ConfiguredHandler.query_log_path = query_log_path
+    ConfiguredHandler.notification_path = notification_path
     return ConfiguredHandler
 
 

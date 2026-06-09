@@ -21,6 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable
 
+from notification import default_notification_path, notify_event
 from ris_client import RisClient
 from storage import (
     append_job_log,
@@ -64,6 +65,7 @@ def run_once(config: Dict[str, Any], config_path: Path) -> int:
     log_dir = base_dir / config.get("log_dir", "logs")
     db_path = base_dir / config.get("database_path", "data/ris_doorplate.sqlite3")
     captcha_dir = base_dir / "data" / "captcha"
+    notification_path = default_notification_path(base_dir)
 
     # 初始化共用資源：logger、SQLite 連線、HTTP client。
     logger = setup_logging(log_dir)
@@ -175,10 +177,31 @@ def run_once(config: Dict[str, Any], config_path: Path) -> int:
                             "finished_at": finished_at,
                         },
                     )
+                    notify_event(
+                        notification_path,
+                        service="試題1爬蟲",
+                        severity="error",
+                        event_type="crawler_page_failed",
+                        message=f"爬蟲分頁任務失敗：{job_key}",
+                        details={
+                            "job_key": job_key,
+                            "query_name": query_name,
+                            "page": page,
+                            "error": str(exc),
+                        },
+                    )
                     logger.exception("Failed job=%s", job_key)
                     break
-        except Exception:
+        except Exception as exc:
             # 例如 CSRF/CAPTCHA key 找不到時，尚未進入分頁，記在 query 層級 log。
+            notify_event(
+                notification_path,
+                service="試題1爬蟲",
+                severity="error",
+                event_type="crawler_query_failed",
+                message=f"爬蟲查詢條件尚未進入分頁前失敗：{query_name}",
+                details={"query_name": query_name, "query": query, "error": str(exc)},
+            )
             logger.exception("Query failed before paging: %s", query_name)
         finally:
             # 對政府網站保留間隔，避免短時間連續請求。

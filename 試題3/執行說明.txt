@@ -1,0 +1,17 @@
+試題3 Log 收集器與異常通知平台執行說明
+
+1. 建議先執行試題1爬蟲，讓 logs/crawler-info.log、crawler-error.log、crawler-job.jsonl 有資料。
+2. 啟動試題2 API，讓 logs/api-query.jsonl 開始記錄查詢。
+3. 開啟 PowerShell，切換到試題3資料夾：
+   cd C:\Users\user\ris_3053_gitlab_submission\試題3
+4. 啟動平台：
+   python main.py
+5. 用瀏覽器打開：
+   http://127.0.0.1:9000
+
+通知規則：
+- 試題1爬蟲異常：寫入 notifications/notifications.jsonl。
+- 試題2查詢結果為空：寫入 notifications/notifications.jsonl。
+
+可選 webhook：
+   $env:NOTIFY_WEBHOOK_URL="https://example.com/webhook"

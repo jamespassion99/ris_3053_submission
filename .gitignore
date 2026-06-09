@@ -20,3 +20,8 @@ venv/
 .DS_Store
 Thumbs.db
 .vscode/
+
+試題2/logs/**
+!試題2/logs/.gitkeep
+試題3/notifications/**
+!試題3/notifications/.gitkeep

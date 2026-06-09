@@ -104,3 +104,17 @@ Invoke-RestMethod "http://127.0.0.1:8000/jobs?status=success"
 ```
 
 代表尚未執行試題1爬蟲，或 `config.json` 的 `database_path` 指向錯誤。
+
+## 與試題3 Log 與異常通知整合
+
+API 每次查詢 `/records`、`/records/{id}`、`/jobs` 都會寫入查詢紀錄：
+
+```text
+logs/api-query.jsonl
+```
+
+異常通知規則：
+
+- `/records` 查詢結果 `total = 0` 時，寫入 `../試題3/notifications/notifications.jsonl`。
+- `/records/{id}` 查無資料時，寫入 `../試題3/notifications/notifications.jsonl`。
+- 若設定 `NOTIFY_WEBHOOK_URL`，會同步 POST 通知 JSON 到 webhook。

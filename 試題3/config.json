@@ -1,0 +1,10 @@
+{
+  "host": "127.0.0.1",
+  "port": 9000,
+  "default_tail_lines": 100,
+  "crawler_info_log": "../試題1/logs/crawler-info.log",
+  "crawler_error_log": "../試題1/logs/crawler-error.log",
+  "crawler_job_log": "../試題1/logs/crawler-job.jsonl",
+  "api_query_log": "../試題2/logs/api-query.jsonl",
+  "notifications_log": "notifications/notifications.jsonl"
+}

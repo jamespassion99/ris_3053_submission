@@ -101,3 +101,13 @@ logs/crawler-job.jsonl
 4. CAPTCHA 採人工輸入，避免自動辨識或繞過驗證機制。
 
 若未來網站改為大量 JavaScript 動態渲染，再評估改用 Selenium 或 Playwright。
+
+## 與試題3異常通知整合
+
+爬蟲在查詢頁初始化失敗、單頁查詢失敗、JSON 解析失敗、HTTP 失敗等異常時，會寫入：
+
+```text
+../試題3/notifications/notifications.jsonl
+```
+
+若環境變數 `NOTIFY_WEBHOOK_URL` 有設定，也會嘗試將同一筆通知以 JSON POST 到 webhook。Webhook 失敗不會中斷爬蟲主流程。

@@ -3,5 +3,6 @@
   "port": 8000,
   "database_path": "../試題1/data/ris_doorplate.sqlite3",
   "default_limit": 50,
-  "max_limit": 500
+  "max_limit": 500,
+  "log_dir": "logs"
 }
